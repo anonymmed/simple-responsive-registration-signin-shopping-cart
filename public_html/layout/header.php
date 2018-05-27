@@ -9,6 +9,6 @@
     <link href="../css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/jquery-1.11.1.min.js"></script>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
 
 </head>
