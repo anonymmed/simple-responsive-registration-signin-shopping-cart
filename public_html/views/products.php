@@ -21,9 +21,9 @@ require_once (__DIR__."/../../Controller/ProductController.php")
         $productController = new ProductController();
         foreach ($productController->getAllProducts() as $product) {
             ?>
-            <div class="item  col-xs-4 col-lg-4">
-                <div class="thumbnail">
-                    <img style="width: 255px;height: 255px;" class="group list-group-image" src="../images/<?= $product['product_name'].'.jpg';?>" alt="<?= $product['product_name']; ?>"/>
+            <div class="item  col-xs-4 col-lg-3">
+                <div class="thumbnail" style="width: 400px;height: 400px;">
+                    <img style="width: 200px;height: 200px;" class="group list-group-image" src="../images/<?= $product['product_name'].'.jpg';?>" alt="<?= $product['product_name']; ?>"/>
                     <div class="caption">
                         <h4 class="group inner list-group-item-heading">
                             Product name: <?= $product['product_name']; ?></h4>
@@ -36,7 +36,7 @@ require_once (__DIR__."/../../Controller/ProductController.php")
                             </div>
                             <br><br>
                             <div class="col-xs-12 col-md-6">
-                                <a class="btn btn-success" href="">Add to cart</a>
+                                <a class="btn btn-success" href="../../action.php?cart=add&pid=<?=$product['id'];?>">Add to cart</a>
                             </div>
                         </div>
                     </div>

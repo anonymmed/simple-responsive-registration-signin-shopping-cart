@@ -14,8 +14,9 @@
 
 
                     <ul class="list-inline text-uppercase top-menu"style="padding-right: 30px;">
-                        <li><a href="" class="btn-toolbar" style="padding-right: 40px;">My cart</a></li>
-                        <li><a class="btn-toolbar" href="">Logout</a></li>
+                        <li><a href="../../action.php?red=home" class="btn" style="padding-right: 20px;">Home</a></li>
+                        <li><a href="../../action.php?red=cart" class="btn" style="padding-right: 20px;">My cart</a></li>
+                        <li><a class="btn" href="../../action.php?logout=true">Logout</a></li>
                     </ul>
 
                 </div>

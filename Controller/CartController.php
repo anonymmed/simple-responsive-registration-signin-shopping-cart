@@ -13,14 +13,18 @@ require_once (__DIR__."/../Service/CartService.php");
 
 class CartController
 {
+
+
     /**
      * @param User $user
      * @param Product $product
+     * @param int $quantity
+     * @return bool
      */
-    public function addToCart(User $user, Product $product) : void
+    public function addToCart(User $user, Product $product, int $quantity) : bool
     {
     $cartService = new CartService();
-    $cartService->addToCart($user,$product);
+    return $cartService->addToCart($user,$product,$quantity);
 
     }
 

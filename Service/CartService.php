@@ -16,23 +16,31 @@ require_once (__DIR__."/../Service/ProductService.php");
 
 class CartService
 {
+
+
     /**
      * @param User $user
      * @param Product $product
+     * @param int $quantity
+     * @return bool
      */
-    public function addToCart(User $user, Product $product) : void
+    public function addToCart(User $user, Product $product, int $quantity) : bool
     {
-        /**
-         * Check if added quantity <= product quantity
-         */
-        $initialQuantity=1;
-        $connection = Db::connect();
-        $statement = $connection->prepare("INSERT INTO cart (user_id,product_id,quantity) VALUES (:user_id, :product_id, :quantity)");
-        $statement->bindParam("user_id",$user->getId());
-        $statement->bindParam("product_id",$product->getId());
-        $statement->bindParam("quantity",$initialQuantity);
-        $statement->execute();
-
+        if($quantity<= $product->getProductQuantity())
+        {
+            $id=$user->getId();
+            $pid = $product->getId();
+            $productPrice = $product->getProductPrice();
+            $connection = Db::connect();
+            $statement = $connection->prepare("INSERT INTO cart (user_id,product_id,quantity,product_price) VALUES (:user_id, :product_id, :quantity, :product_price)");
+            $statement->bindParam("user_id",$id);
+            $statement->bindParam("product_id",$pid);
+            $statement->bindParam("quantity",$quantity);
+            $statement->bindParam("product_price",$productPrice);
+            $statement->execute();
+            return true;
+        }
+        return false;
 
     }
 
@@ -44,12 +52,12 @@ class CartService
      */
     public function removeFromCart(User $user, Product $product) : float
     {
+        $id = $user->getId();
         $pid = $product->getId();
-        $uid=$user->getId();
         $connection = Db::connect();
         $statement = $connection->prepare("DELETE from cart where product_id = :product_id and user_id = :user_id");
         $statement->bindParam("product_id",$pid);
-        $statement->bindParam("user_id",$uid);
+        $statement->bindParam("user_id",$id);
         $statement->execute();
         if($this->getTotal($user)==null)
         {
@@ -65,9 +73,10 @@ class CartService
      */
     public function getTotal(User $user) : ? float
     {
+        $id = $user->getId();
         $connection = Db::connect();
         $statement = $connection->prepare('select sum(product_price) as "total" from cart where user_id= :user_id');
-        $statement->bindParam("user_id",$user->getId());
+        $statement->bindParam("user_id",$id);
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if($result["total"]== "NULL")
@@ -91,10 +100,11 @@ class CartService
         {
             return null;
         }
+        $id = $user->getId();
         $connection = Db::connect();
         $statement = $connection->prepare('update cart set quantity = :quantity where user_id = :user_id');
         $statement->bindParam("quantity",$quantity);
-        $statement->bindParam("user_id",$user->getId());
+        $statement->bindParam("user_id",$id);
         $statement->execute();
         return "update has been successfully done";
     }
@@ -121,7 +131,5 @@ class CartService
         }
         return $listProduct;
     }
-
-
 
 }
