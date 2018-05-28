@@ -1,3 +1,14 @@
+<?php
+if(session_status()== PHP_SESSION_NONE)
+{
+    session_start();
+}
+
+if (!$_SESSION['id'])
+{
+    header('Location: ./../views/signin.php');
+}
+?>
 <div class="topbar" style="background-color: #f5f5f5">
     <div class="container">
         <div class="row">
