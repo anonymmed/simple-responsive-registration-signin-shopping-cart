@@ -8,7 +8,6 @@ if(session_status()== PHP_SESSION_NONE)
 }
 
 ?>
-
 <div class="container">
     <?php
     require_once (__DIR__."/../layout/topmenu.php");
@@ -51,11 +50,11 @@ if(session_status()== PHP_SESSION_NONE)
                 </td>
                 <td data-th="Price">$<?=$mycart->getProductPrice(); ?></td>
                 <td data-th="Quantity">
-                    <input type="number" class="form-control text-center" value="<?=$mycart->getProductQuantity(); ?>">
+                    <input type="number" class="form-control text-center quantity" data-id="<?= $mycart->getId();?>" value="<?=$mycart->getProductQuantity(); ?>">
                 </td>
-                <td data-th="Subtotal" class="text-center">$<?=$mycart->getProductQuantity()*$mycart->getProductPrice(); ?></td>
+                <td data-th="Subtotal" class="text-center subtotal" data-id="<?= $mycart->getId();?>" data-price="<?=$mycart->getProductPrice(); ?>"><?=$mycart->getProductQuantity()*$mycart->getProductPrice(); ?></td>
                 <td class="actions" data-th="">
-                    <a href="" class="btn btn-info btn-sm"><i class="fa fa-refresh"></i></a>
+                    <a href="" data-id="<?= $mycart->getId();?>" class="btn btn-info btn-sm refresh"><i class="fa fa-refresh"></i></a>
                     <a href="../../action.php?delete=<?= $mycart->getId();?>" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></a>
                 </td>
             </tr>
@@ -65,16 +64,16 @@ if(session_status()== PHP_SESSION_NONE)
         </tbody>
         <tfoot>
         <tr class="visible-xs">
-            <td class="text-center"><strong>Total 1.99</strong></td>
+            <td class="text-center"><strong class="total">Total 1.99</strong></td>
         </tr>
         <tr>
             <td><a href="products.php" class="btn btn-warning"><i class="fa fa-angle-left"></i> Continue Shopping</a></td>
             <td colspan="2" class="hidden-xs"></td>
-            <td class="hidden-xs text-center"><strong>Total $1.99</strong></td>
-            <td><select class="btn-group" required style="height: 30px;">
-                    <option value="" disabled selected>Choose transport type</option>
-                    <option value="first Option">Pick up 0$</option>
-                    <option value="Second Option">UPS 5$</option>
+            <td class="hidden-xs text-center"><strong class="total">Total $1.99</strong></td>
+            <td><select class="btn-group" name="transport" required style="height: 30px;">
+                    <option value="disabled" disabled selected>Choose transport type</option>
+                    <option value="0">Pick up 0$</option>
+                    <option value="5">UPS 5$</option>
                 </select>
             </td>
 
@@ -85,3 +84,106 @@ if(session_status()== PHP_SESSION_NONE)
     <input type="submit" name="checkout" class="btn btn-success btn-block" value="Checkout"/>
     </div>
 </div>
+<script>
+    function getTotal(a)
+    {
+
+        var products = $('.subtotal');
+        var total = 0;
+        for (var i=0;i<products.length;i++)
+        {
+            total +=parseFloat(products[i].innerHTML);
+        }
+        if(a==null)
+        {
+        $('.total').text("$"+total.toFixed(2));
+        }
+        else
+        {
+            a=parseFloat(a);
+
+            total+=a;
+            $('.total').text("$"+total.toFixed(2));
+
+        }
+        return total;
+    };
+    $(document).ready(function () {
+        getTotal();
+        var products = $('.subtotal');
+        var total = 0;
+       $('.refresh').on("click",function (e) {
+           e.preventDefault();
+           var pid = $(this).attr("data-id");
+           var quantity = $('.quantity[data-id='+pid+']').val();
+           $.ajax({
+               type:'post',
+               url:'../../action.php',
+               data:'refresh=yes&product_id='+pid+'&quantity='+quantity,
+               cache:false,
+               success:function (response) {
+                   if(response == true)
+                   {
+                       var sub = $('.subtotal[data-id='+pid+']').attr('data-price') * quantity;
+                       sub= sub.toFixed(2);
+                       $('.subtotal[data-id='+pid+']').text(sub);
+                      getTotal();
+                       swal("Great!", "You have successfully updated the product quantity! to "+quantity, "success");
+
+                   }
+                   else if(response =="product removed from cart")
+                   {
+                       swal("Great!", "You have successfully removed the product from your cart! ", "success");
+                       setTimeout(function () {
+                           window.location.href="cart.php";
+
+                       },2000);
+                   }
+                   else
+                   {
+                       swal("Error!", "You reached the maximum product quantity on stock!", "error");
+                   }
+               }
+           })
+       });
+        $('.btn-group').on("change",function (e) {
+            var price = $('.btn-group option:selected').val();
+            getTotal(price);
+
+        });
+
+        $('.btn.btn-success.btn-block').on("click",function (e) {
+            if($('.btn-group option:selected').val()==="disabled")
+            {
+                swal("Error!", "Please select a transport method!", "error");
+            }
+            else
+            {
+            var price = $('.btn-group option:selected').val();
+            var total = parseFloat(getTotal(price));
+            total=total.toFixed(2);
+           e.preventDefault();
+           $.ajax({
+              type:'post',
+              url:'../../action.php',
+              data:'checkout=yes&price='+total,
+               cache:false,
+               success:function (response) {
+                   if(response)
+                   {
+
+                       swal("Great!", "You have successfully paid your products! ", "success");
+                       setTimeout(function () {
+                           window.location.href='products.php';
+                       },2000);
+                   }
+                   else
+                   {
+                       swal("Error!","insufficient funds!","error");
+                   }
+               }
+           });
+        }
+        });
+    });
+</script>

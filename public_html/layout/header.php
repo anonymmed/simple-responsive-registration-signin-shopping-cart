@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="../css/jquery.rateyo.min.css"/>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <script type="text/javascript" src="../js/jquery.rateyo.js"></script>
+    <script type="text/javascript" src="../js/sweetalert.min.js"></script>
 
 
 

@@ -39,6 +39,7 @@ else {
         $firstName = trim($_POST['firstName']);
         $lastName = trim($_POST['lastName']);
         $userController->signUp($email,$password,$firstName,$lastName);
+        header("Location: ./public_html/views/signin.php");
     }
     else
     {

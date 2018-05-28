@@ -28,6 +28,19 @@ class CartController
 
     }
 
+
+    /**
+     * @param int $uid
+     * @param int $id
+     * @return int
+     */
+    public function getUserCartByProduct(int $uid, int $id) : int
+    {
+        $cartService = new CartService();
+        return $cartService->getUserCartByProduct($id);
+    }
+
+
     /**
      * @param User $user
      * @param Product $product
@@ -54,9 +67,9 @@ class CartController
      * @param User $user
      * @param Product $product
      * @param int $quantity
-     * @return null|string
+     * @return bool
      */
-    public function updateQuantity(User $user, Product $product, int $quantity) : ? string
+    public function updateQuantity(User $user, Product $product, int $quantity) :  bool
     {
         $cartService = new CartService();
         return $cartService->updateQuantity($user,$product,$quantity);
@@ -72,4 +85,14 @@ class CartController
         return $cartService->getMyCart($user);
     }
 
+
+    /**
+     * @param int $user_id
+     */
+    public function emptyCartAfterCheckout(int $user_id) : void
+    {
+        $cartService = new CartService();
+        $cartService->emptyCartAfterCheckout($user_id);
+
+    }
 }

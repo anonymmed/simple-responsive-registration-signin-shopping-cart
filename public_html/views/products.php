@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__."/../layout/header.php");
-require_once (__DIR__."/../../Controller/ProductController.php")
+require_once (__DIR__."/../../Controller/ProductController.php");
+require_once (__DIR__."/../../Controller/RatingController.php");
 ?>
 <div class="container">
     <?php
@@ -17,6 +18,7 @@ require_once (__DIR__."/../../Controller/ProductController.php")
     <br>
     <div id="products" class="row list-group">
         <?php
+        $ratingController = new RatingController();
         $productController = new ProductController();
         foreach ($productController->getAllProducts() as $product) {
             ?>
@@ -29,11 +31,11 @@ require_once (__DIR__."/../../Controller/ProductController.php")
                         <p class="lead">
                             Quantity: <?= $product['quantity'];?></p>
                         <p class="lead"> Price : <?= $product['price'];?>$</p>
-                        <p class="lead"> Rating : <?= $product['price'];?>$</p>
+                        <p class="lead" data-id="<?=$product['id'];?>"> Rating : <?= $ratingController->getRatingByProductId($product['id']);?>/5</p>
                         <div class="row">
-                                  <div class="rateyo-readonly-widg" style="bottom: 20px;"></div>
+                                  <div class="rateyo-readonly-widg" data-id="<?=$product['id'];?>" style="bottom: 20px;"></div>
                             <div class="col-xs-12 col-md-10">
-                                <a class="btn btn-success" href="../../action.php?cart=add&pid=<?=$product['id'];?>" >Add to cart</a>
+                                <a class="btn btn-success cart" data-id="<?=$product['id'];?>" href="" >Add to cart</a>
                             </div>
                         </div>
                     </div>
@@ -46,31 +48,83 @@ require_once (__DIR__."/../../Controller/ProductController.php")
     </div>
 </div>
 <script>
-
-    $(function () {
-
+    function refreshRating () {
+        var newRate;
         $.ajax({
-           url:'../../action.php?rating',
-           data:'',
-           cache:false,
-           success:function (data) {
+            type:'post',
+            url:'../../action.php',
+            data:'rating=getRating',
+            cache:false,
+            success:function (response) {
+                $.each(JSON.parse(response),function (key, value) {
 
-           }
+                    $(".rateyo-readonly-widg[data-id="+value.product_id+"]").rateYo({
+
+                        rating: value.rate,
+                        numStars: 5,
+                        precision: 2,
+                        minValue: 1,
+                        maxValue: 5
+                    }).on("rateyo.change", function (e, data) {
+
+                        console.log(data.rating);
+                        newRate= data.rating;
+                    }).on("click",function (e2, data2) {
+                        $.ajax({
+                            type:'get',
+                            url:'../../action.php',
+                            data:'insertRating=insertRating&product_id='+value.product_id+'&rate='+newRate,
+                            cache:false,
+                            success:function (response2) {
+                                if(response2 ==="success")
+                                {
+
+                                    swal("Thank you!", "You have successfully rated the product!", "success");
+                                    $(".lead[data-id="+value.product_id+"]").text("Rating : "+newRate+"/5");
+                                    refreshRating();
+                                }
+                                else
+                                {
+                                    swal("Error!", "Something wrong happened!", "error");
+                                }
+                            }
+
+                        })
+                    });
+
+                });
+            }
         });
-        var rating = 3;
 
 
-        $(".rateyo-readonly-widg").rateYo({
 
-            rating: rating,
-            numStars: 5,
-            precision: 2,
-            minValue: 1,
-            maxValue: 5
-        }).on("rateyo.change", function (e, data) {
+    }
+$(document).ready(function () {
+    refreshRating();
+    $(".btn-success.cart").on("click",function (e)
+    {
+        var productId= $(this).attr("data-id");
+        e.preventDefault();
+        $.ajax({
+           type:'get',
+            url:'../../action.php',
+            data:'cart=add&pid='+productId,
+            cache:false,
+            success:function (response) {
+            if(response)
+            {
+                swal("Thank you!", "You have successfully added a product to your cart!", "success");
 
-            console.log(data.rating);
+            }
+            else
+            {
+                swal("Error!", "You reached the maximum product quantity!", "error");
+
+            }
+            }
         });
-    });
+    })
+
+}) ;
 </script>
 
