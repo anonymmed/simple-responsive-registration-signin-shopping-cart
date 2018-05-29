@@ -21,7 +21,7 @@ class RatingService
     public function getRatingByProductId(int $id) : ? float
     {
         $connection = Db::connect();
-        $statement = $connection->prepare("select avg(rate) as 'rate' from rating where product_id = :product_id");
+        $statement = $connection->prepare("select truncate(avg(rate),2) as 'rate' from rating where product_id = :product_id");
         $statement->bindParam("product_id",$id);
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
@@ -40,7 +40,7 @@ class RatingService
     public function getProductsRating() : string
     {
         $connection = Db::connect();
-        $statement = $connection->query("select product_id, avg(rate) as 'rate' from rating GROUP by product_id");
+        $statement = $connection->query("select product_id, truncate(avg(rate),2) as 'rate' from rating GROUP by product_id");
         $statement->execute();
         return json_encode($statement->fetchAll(PDO::FETCH_ASSOC),true);
 
@@ -48,11 +48,28 @@ class RatingService
     }
 
     /**
+     * @param int $id
+     * @return string
+     */
+    public function getProductRatingById(int $id) : string
+    {
+        $connection = Db::connect();
+        $statement = $connection->prepare("select product_id, truncate(avg(rate),2) as 'rate' from rating where product_id = :product_id GROUP by product_id");
+        $statement->bindParam("product_id",$id);
+        $statement->execute();
+        return json_encode($statement->fetch(PDO::FETCH_ASSOC),true);
+
+
+    }
+
+
+    /**
      * @param int $userId
      * @param int $productId
      * @param float $rate
+     * @return bool
      */
-    public function insertRatingToProduct(int $userId, int $productId, float $rate) : void
+    public function insertRatingToProduct(int $userId, int $productId, float $rate) : bool
     {
 
         $connection = Db::connect();
@@ -63,11 +80,7 @@ class RatingService
         $statement->fetch(PDO::FETCH_ASSOC);
         if($statement->rowCount()>0)
         {
-            $statement = $connection->prepare("update rating set rate = :rate where user_id = :user_id and product_id = :product_id");
-            $statement->bindParam("rate",$rate);
-            $statement->bindParam("product_id",$productId);
-            $statement->bindParam("user_id",$userId);
-            $statement->execute();
+           return false;
         }
         else
         {
@@ -76,6 +89,7 @@ class RatingService
         $statement->bindParam("user_id",$userId);
         $statement->bindParam("rate",$rate);
         $statement->execute();
+        return true;
         }
     }
 }

@@ -38,11 +38,26 @@ class ProductService
     public function updateProductQuantity(int $id) : void
     {
         $connection = Db::connect();
-        $statement = $connection->query("update products set quantity = quantity-1 where id = :id");
+        $statement = $connection->prepare("update products set quantity = quantity-1 where id = :id");
         $statement->bindParam("id",$id);
         $statement->execute();
 
     }
+
+    /**
+     * @param int $id
+     * @param int $quantity
+     */
+    public function updateProductsQuantity(int $id, int $quantity) : void
+    {
+        $connection = Db::connect();
+        $statement = $connection->prepare("update products set quantity = quantity- :quantity where id = :id");
+        $statement->bindParam("quantity",$quantity);
+        $statement->bindParam("id",$id);
+        $statement->execute();
+
+    }
+
 
     /**
      * @return array

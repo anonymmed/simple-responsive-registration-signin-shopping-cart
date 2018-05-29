@@ -2,6 +2,7 @@
 require_once(__DIR__."/../layout/header.php");
 require_once (__DIR__."/../../Controller/ProductController.php");
 require_once (__DIR__."/../../Controller/RatingController.php");
+
 ?>
 <div class="container">
     <?php
@@ -29,13 +30,13 @@ require_once (__DIR__."/../../Controller/RatingController.php");
                         <h4 class="group inner list-group-item-heading">
                             Product name: <?= $product['product_name']; ?></h4>
                         <p class="lead">
-                            Quantity: <?= $product['quantity'];?></p>
+                            Quantity: <?= ($product['quantity']>0) ? $product['quantity'] : "Out of stock";?></p>
                         <p class="lead"> Price : <?= $product['price'];?>$</p>
                         <p class="lead" data-id="<?=$product['id'];?>"> Rating : <?= $ratingController->getRatingByProductId($product['id']);?>/5</p>
                         <div class="row">
                                   <div class="rateyo-readonly-widg" data-id="<?=$product['id'];?>" style="bottom: 20px;"></div>
                             <div class="col-xs-12 col-md-10">
-                                <a class="btn btn-success cart" data-id="<?=$product['id'];?>" href="" >Add to cart</a>
+                                <a <?= ($product['quantity']>0) ? "" :"disabled"; ?> class="btn btn-success cart" data-id="<?=$product['id'];?>" href="" >Add to cart</a>
                             </div>
                         </div>
                     </div>
@@ -76,16 +77,31 @@ require_once (__DIR__."/../../Controller/RatingController.php");
                             data:'insertRating=insertRating&product_id='+value.product_id+'&rate='+newRate,
                             cache:false,
                             success:function (response2) {
-                                if(response2 ==="success")
+                                if(response2)
                                 {
 
                                     swal("Thank you!", "You have successfully rated the product!", "success");
+                                    $.ajax({
+                                        type:'post',
+                                        url:'../../action.php',
+                                        data:'ratingById=getRating&pid='+value.product_id,
+                                        cache:false,
+                                       success:function (getrating) {
+                                            var pRating = JSON.parse(getrating);
+
+                                               $(".lead[data-id=" + value.product_id + "]").text("Rating : " + pRating.rate + "/5");
+                                           refreshRating();
+                                           setTimeout(function () {
+                                               window.location.href="products.php";
+                                           },1000);
+                                       }
+                                    });
                                     $(".lead[data-id="+value.product_id+"]").text("Rating : "+newRate+"/5");
                                     refreshRating();
                                 }
                                 else
                                 {
-                                    swal("Error!", "Something wrong happened!", "error");
+                                    swal("Error!", "You have already rated this product!", "error");
                                 }
                             }
 

@@ -41,4 +41,13 @@ class ProductController
         return $productService->getAllProducts();
     }
 
+    /**
+     * @param int $id
+     * @param int $quantity
+     */
+    public function updateProductsQuantity(int $id, int $quantity) : void
+    {
+        $productService = new ProductService();
+        $productService->updateProductsQuantity($id,$quantity);
+    }
 }

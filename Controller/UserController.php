@@ -44,6 +44,14 @@ class UserController
         $userService = new UserService();
         return $userService->getUserById($id);
     }
-
+    /**
+     * @param int $uid
+     * @param float $cash
+     */
+    public function updateCash(int  $uid, float $cash) : void
+    {
+        $userService = new UserService();
+        $userService->updateCash($uid,$cash);
+    }
 
 }

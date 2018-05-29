@@ -9,7 +9,25 @@ class User
     private $password;
     private  $firstName;
     private $lastName;
+    private $cash;
 
+
+    /**
+     * @return float
+     */
+    public function getCash() : float
+    {
+        return $this->cash;
+    }
+
+
+    /**
+     * @param float $cash
+     */
+    public function setCash(float $cash): void
+    {
+        $this->cash = $cash;
+    }
     public function getCart()
     {
 

@@ -35,12 +35,22 @@ class RatingController
      * @param int $userId
      * @param int $productId
      * @param float $rate
+     * @return bool
      */
-    public function insertRatingToProduct(int $userId, int $productId, float $rate) : void
+    public function insertRatingToProduct(int $userId, int $productId, float $rate) : bool
     {
         $ratingService = new RatingService();
-        $ratingService->insertRatingToProduct($userId,$productId,$rate);
+        return $ratingService->insertRatingToProduct($userId,$productId,$rate);
 
     }
 
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function getProductRatingById(int $id) : string
+    {
+        $ratingService = new RatingService();
+        return $ratingService->getProductRatingById($id);
+    }
 }

@@ -25,7 +25,7 @@ if (!$_SESSION['id'])
 
 
                     <ul class="list-inline text-uppercase top-menu"style="padding-right: 30px;">
-                        <li><a href="../../action.php?red=home" class="btn" style="padding-right: 20px;">Cash : <?= $_SESSION['cash'].'$'; ?></a></li>
+                        <li><a href="" class="btn" style="padding-right: 20px;">Cash : <?= $_SESSION['cash'].'$'; ?></a></li>
                         <li><a href="../../action.php?red=home" class="btn" style="padding-right: 20px;">Home</a></li>
                         <li><a href="../../action.php?red=cart" class="btn" style="padding-right: 20px;">My cart</a></li>
                         <li><a class="btn" href="../../action.php?logout=true">Logout</a></li>

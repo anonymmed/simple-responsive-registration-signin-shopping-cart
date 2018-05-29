@@ -62,11 +62,18 @@ if (isset($_GET['cart']))
          $ratingController = new RatingController();
          echo $ratingController->getProductsRating();
     }
+
+    if (isset($_POST['ratingById']))
+    {
+        $id = $_POST['pid'];
+        $ratingController = new RatingController();
+        echo $ratingController->getProductRatingById($id);
+    }
     if((isset($_GET['insertRating'])))
     {
         $ratingController = new RatingController();
-        $ratingController->insertRatingToProduct($_SESSION['id'],$_GET['product_id'],$_GET['rate']);
-        echo "success";
+        echo $ratingController->insertRatingToProduct($_SESSION['id'],$_GET['product_id'],$_GET['rate']);
+
     }
     if(isset($_GET['getrow']))
     {
@@ -96,7 +103,20 @@ if (isset($_GET['cart']))
         if($_POST['price']<=$_SESSION['cash'])
         {
             $cartController = new CartController();
+            $userController = new UserController();
+            $user = $userController->getUserById($_SESSION['id']);
+            $listProducts = $cartController->getMyCart($user);
+            $productController = new ProductController();
+            foreach ($listProducts as $listProduct)
+            {
+                $productController->updateProductsQuantity($listProduct->getId(),$listProduct->getProductQuantity());
+            }
+
             $cartController->emptyCartAfterCheckout($_SESSION['id']);
+            $user = $userController->getUserById($_SESSION['id']);
+            $cash = $_SESSION['cash']-$_POST['price'];
+            $userController->updateCash($_SESSION['id'],$cash);
+            $listProducts[] = $cartController->getMyCart($user);
             $_SESSION['cash']-=$_POST['price'];
             echo true;
         }
@@ -105,4 +125,5 @@ if (isset($_GET['cart']))
             echo false;
         }
     }
+
 ?>

@@ -18,7 +18,7 @@ else {
 
         if(is_null($userInfo))
         {
-            header('Location: ./signin.php?msg=error');
+            header('Location: ./public_html/views/signin.php?msg=error');
         }
         else
         {
@@ -27,7 +27,7 @@ else {
             $_SESSION['email']=$userInfo['email'];
             $_SESSION['fName']=$userInfo['first_name'];
             $_SESSION['lName']=$userInfo['last_name'];
-            $_SESSION['cash']=100;
+            $_SESSION['cash']=$userInfo['cash'];
             header('Location: ./home.php');
         }
     }

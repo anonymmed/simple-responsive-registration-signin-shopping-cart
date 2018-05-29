@@ -91,4 +91,19 @@ class UserService
         return $user;
 
     }
+
+    /**
+     * @param int $uid
+     * @param float $cash
+     */
+    public function updateCash(int  $uid, float $cash) : void
+    {
+
+        $connection = Db::connect();
+        $statement = $connection->prepare("update users set cash = :cash where id = :user_id");
+        $statement->bindParam("cash",$cash);
+        $statement->bindParam("user_id", $uid);
+        $statement->execute();
+    }
+
 }
